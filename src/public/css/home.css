@@ -1,0 +1,24 @@
+.container-fluid {
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+}
+
+aside {
+  margin: 0px;
+  padding: 0px;
+  background-color: blue;
+  flex-basis: 18%;
+  height: 850px;
+}
+
+a {
+  font-family: "Helvetica", sans-serif;
+  font-size: 22px;
+  color: white;
+}
+
+main {
+  height: 850px;
+  flex-basis: 82%;
+}
