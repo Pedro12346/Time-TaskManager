@@ -1,7 +1,7 @@
 let express = require("express")
 let router = express.Router()
 
-//Default pages - login page
+//Default page - login page
 router.get("/", (req, res) => {
   res.send("Default page")
 })

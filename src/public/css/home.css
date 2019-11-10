@@ -7,7 +7,7 @@
 aside {
   margin: 0px;
   padding: 0px;
-  background-color: blue;
+  background-color: #007bff;
   flex-basis: 18%;
   height: 850px;
 }
@@ -16,6 +16,10 @@ a {
   font-family: "Helvetica", sans-serif;
   font-size: 22px;
   color: white;
+}
+
+#first-row{
+  margin-top: 70px;
 }
 
 main {

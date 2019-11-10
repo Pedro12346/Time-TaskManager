@@ -1,0 +1,43 @@
+
+#tab-title {
+  text-align: center;
+  background-color: #f8f9fa;
+  margin: 0px;
+  height: 70px;
+  border-bottom-style: solid;
+  border-top: 1px;
+  border-width: 1px;
+  border-color: black;
+}
+#submit-task-button {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.container{
+  margin: 10px 0px;
+}
+.task-card{
+  border-style: solid;
+  border-radius: 25px;
+  border-color: #00BFFF;
+  margin: 10px 0px;
+}
+
+.task-header-wrapper {
+  padding: 10px;
+}
+
+.task-header, .task-body {
+  background-color: red;
+  margin:5px 0;
+}
+
+.card-buttons {
+  width: 15%;
+}
+
+.more-info-button {
+  margin-left: 0px;
+  padding: 0px;
+}
