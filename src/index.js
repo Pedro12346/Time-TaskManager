@@ -18,7 +18,6 @@ app.use(function(req, res, next) {
 
 let port = "8080"
 
-
 //Settings
 app.set("port", process.env.PORT || port)
 app.set("views", path.join(__dirname, "views"))
