@@ -41,7 +41,6 @@ h1 {
 }
 
 .task-header, .task-body {
-  background-color: red;
   margin:5px 0;
 }
 
@@ -52,4 +51,10 @@ h1 {
 .more-info-button {
   margin-left: 0px;
   padding: 0px;
+}
+
+.description-body{
+  margin-top: 15px;
+  margin-bottom: 5px;
+  padding: 10px;
 }

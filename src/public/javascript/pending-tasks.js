@@ -31,7 +31,7 @@ $(document).ready(() => {
   //add click event to delete button
   $(".container").on("click", ".delete-button", (event) => {
     event.preventDefault()
-    let taskID = $(event.target).parent().parent().parent().attr("id")
+    let taskID = getIDFromButton(event.target)
     deleteTask(taskID)
   })
 
@@ -40,13 +40,20 @@ $(document).ready(() => {
     event.preventDefault()
 
     let isBeingTracked = $(event.target).hasClass("tracking")
-    let taskID = $(event.target).parent().parent().parent().attr("id")
+    let taskID = getIDFromButton(event.target)
 
     if(isBeingTracked) {
       stopTracking(taskID,  $(event.target))
     } else {
       startTracking(taskID,  $(event.target))
     }
+  })
+
+  //add click event to completed buttton
+  $(".container").on("click", ".completed-button", (event) => {
+    event.preventDefault()
+    let taskID = getIDFromButton(event.target)
+    markAsCompleted(taskID);
   })
 })
 
@@ -85,8 +92,29 @@ function stopTracking(taskID, button) {
   })
 
   //change appereance and class names
-  button.removeClass("btn-warning").removeClass("tracking").addClass("btn-success").addClass("not-tracking")
+  button.removeClass("btn-warning").removeClass("tracking").addClass("btn-primary").addClass("not-tracking")
   button.text("Start tracking")
+}
+
+function markAsCompleted(taskID) {
+  let completedDate = Date.now()
+
+  $.ajax({
+    url: "http://localhost:" + port + "/complete-task",
+    method: "PUT",
+    dataType: "JSON",
+    data: {
+      taskID: taskID,
+      completedDate: completedDate
+    },
+    success: (responseJSON) => {
+      removeTaskCard(responseJSON.taskID)
+    },
+    error: (err) => {
+      console.log(err)
+    }
+
+  })
 }
 
 /*
@@ -115,7 +143,6 @@ function displayTasks(tasks) {
 
 //delete task from db
 function deleteTask(taskID) {
-  console.log("ID TO DELETE = " + taskID)
   $.ajax({
     url: "http://localhost:" + port + "/delete-task/" + taskID,
     method: "DELETE",
@@ -151,12 +178,12 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
         "</div>" +
 
         "<div class='d-flex'>" +
-        "<button class='btn btn-link more-info-button' type='button' data-toggle='collapse' data-target='#task-"+ taskID + "' aria-expanded='false' aria-controls='task-"+ taskID + "'> Description </button>"+
-        "<button class='btn btn-success p-2 ml-auto card-buttons'>Mark as completed</button>"+
+        "<button class='btn btn-secondary btn-sm' type='button' data-toggle='collapse' data-target='#task-"+ taskID + "' aria-expanded='false' aria-controls='task-"+ taskID + "'> Description </button>"+
+        "<button class='btn btn-success p-2 ml-auto completed-button card-buttons'>Mark as completed</button>"+
         "</div>" +
 
         "<div class='collapse' id='task-"+ taskID + "'>" +
-          "<div class='card card-body'>" +
+          "<div class='card description-body'>" +
             description +
           "</div>" +
         "</div>" +
@@ -167,7 +194,7 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
 }
 
 /*
-Remove a pending task card that has a certain id
+Remove a task card
 */
 function removeTaskCard(taskID) {
   $("#" + taskID).remove()
@@ -195,13 +222,17 @@ function addTask() {
     dataType: "JSON",
     data: newTask,
     success: (responseJSON) => {
-      addTaskCard(responseJSON._id, responseJSON.name, responseJSON.description, responseJSON.timeSpentInSeconds, responseJSON.category ,responseJSON.priority, responseJSON.dueDate)
+      addTaskCard(responseJSON.taskID, responseJSON.name, responseJSON.description, responseJSON.timeSpentInSeconds, responseJSON.category ,responseJSON.priority, responseJSON.dueDate)
       emptyFields()
     },
     error: (err) => {
       console.log(err)
     }
   })
+}
+
+function getIDFromButton(button) {
+  return $(button).parent().parent().parent().attr("id")
 }
 
 function emptyFields() {
