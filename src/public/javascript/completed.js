@@ -3,6 +3,13 @@ let port = "8080"
 $(document).ready(() => {
   retrieveTasks()
 
+  //add click event to search button
+  $("#search-button").on("click", (event) => {
+    event.preventDefault()
+    let keyword = $("#search-input").val()
+    searchTask(keyword)
+  })
+
   //add click event to delete button
   $(".container").on("click", ".delete-button", (event) => {
     event.preventDefault()
@@ -18,6 +25,26 @@ $(document).ready(() => {
   })
 
 })
+
+
+function searchTask(keyword) {
+
+  $.ajax({
+    url: "http://localhost:" + port + "/search",
+    method: "PUT",
+    dataType: "JSON",
+    data: {
+      keyword: keyword,
+      completed: true
+    },
+    success: (responseJSON) => {
+      removeAllCards()
+      displayTasks(responseJSON.tasks)
+    },
+    error: (err) => {
+    }
+  })
+}
 
 
 function markAsUncompleted(taskID) {
@@ -36,6 +63,21 @@ function markAsUncompleted(taskID) {
       console.log(err)
     }
 
+  })
+}
+
+//delete task from db
+function deleteTask(taskID) {
+  $.ajax({
+    url: "http://localhost:" + port + "/delete-task/" + taskID,
+    method: "DELETE",
+    dataType: "JSON",
+    success: (responseJSON) => {
+      removeTaskCard(responseJSON.taskID)
+    },
+    error: (err) => {
+      console.log(err)
+    }
   })
 }
 
@@ -99,6 +141,11 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
   "</div>"
 
   $(".container").prepend(cardDiv)
+}
+
+
+function removeAllCards() {
+  $(".container").empty()
 }
 
 function fromSecondsToHMS(seconds) {

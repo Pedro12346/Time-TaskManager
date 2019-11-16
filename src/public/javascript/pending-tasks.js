@@ -22,6 +22,13 @@ $(document).ready(() => {
     $("#submit-task-button").attr("disabled", isDisabled);
   })
 
+  //add click event to search button
+  $("#search-button").on("click", (event) => {
+    event.preventDefault()
+    let keyword = $("#search-input").val()
+    searchTask(keyword)
+  })
+
   //add click event to add task button
   $("#submit-task-button").on("click", (event) => {
     event.preventDefault()
@@ -57,6 +64,25 @@ $(document).ready(() => {
   })
 })
 
+
+function searchTask(keyword) {
+
+  $.ajax({
+    url: "http://localhost:" + port + "/search",
+    method: "PUT",
+    dataType: "JSON",
+    data: {
+      keyword: keyword,
+      completed: false
+    },
+    success: (responseJSON) => {
+      removeAllCards()
+      displayTasks(responseJSON.tasks)
+    },
+    error: (err) => {
+    }
+  })
+}
 
 function startTracking(taskID, button) {
 
@@ -200,6 +226,10 @@ function removeTaskCard(taskID) {
   $("#" + taskID).remove()
 }
 
+function removeAllCards() {
+  $(".container").empty()
+}
+
 //send task to DB
 function addTask() {
   let name = $("#name-input").val()
@@ -216,6 +246,7 @@ function addTask() {
     dueDate: dueDate
   }
 
+  console.log(newTask)
   $.ajax({
     url: "http://localhost:" + port + "/insert-task",
     method: "POST",

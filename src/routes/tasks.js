@@ -13,6 +13,18 @@ router.get("/completed-tasks", (req, res) => {
   res.render("tasks/completed")
 })
 
+//search tasks by keyword
+router.put("/search", async (req, res) => {
+  let {keyword, completed} = req.body
+  try {
+    let tasks = await Task.find({$text: { $search: keyword}, completed: completed})
+    console.log(tasks)
+    return res.status(200).json({tasks: tasks})
+  } catch (e) {
+    return res.status(404)
+  }
+})
+
 
 router.get("/get-pending-tasks", async (req, res) => {
 
