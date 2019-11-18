@@ -3,12 +3,12 @@ let router = express.Router()
 
 //Default page - login page
 router.get("/", (req, res) => {
-  res.send("Default page")
+  res.render("users/login", {layout: "users"})
 })
 
 //Sign up route
 router.get("/signup", (req, res) => {
-  res.send("signup form")
+  res.render("users/signup", {layout: "users"})
 })
 
 

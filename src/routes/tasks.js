@@ -25,7 +25,6 @@ router.put("/search", async (req, res) => {
   }
 })
 
-
 router.get("/get-pending-tasks", async (req, res) => {
 
   try {
@@ -37,7 +36,6 @@ router.get("/get-pending-tasks", async (req, res) => {
 })
 
 router.get("/get-completed-tasks", async (req, res) => {
-
   try {
     let tasks = await Task.find({completed: true})
     return res.status(200).json({pendingTasks: tasks})

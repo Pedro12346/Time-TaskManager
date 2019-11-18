@@ -1,0 +1,10 @@
+body {
+  background-color: #ECFCFF;
+}
+
+main {
+  height: 850px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
