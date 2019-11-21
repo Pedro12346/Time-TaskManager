@@ -57,7 +57,7 @@ function markAsUncompleted(taskID) {
       taskID: taskID,
     },
     success: (responseJSON) => {
-      removeTaskCard(responseJSON.taskID)
+      removeTaskCard(responseJSON._id)
     },
     error: (err) => {
       console.log(err)
@@ -73,19 +73,12 @@ function deleteTask(taskID) {
     method: "DELETE",
     dataType: "JSON",
     success: (responseJSON) => {
-      removeTaskCard(responseJSON.taskID)
+      removeTaskCard(responseJSON._id)
     },
     error: (err) => {
       console.log(err)
     }
   })
-}
-
-/*
-Remove a task card
-*/
-function removeTaskCard(taskID) {
-  $("#" + taskID).remove()
 }
 
 
@@ -106,25 +99,26 @@ function retrieveTasks() {
 
 function displayTasks(tasks) {
   for(let i = 0; i < tasks.length; i++) {
-    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, tasks[i].dueDate)
+    let date = getFormattedDate(tasks[i].completedDate)
+    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date)
   }
 }
 
 
-function addTaskCard(taskID, name, description, timeSpent, category, priority, dueDate) {
+function addTaskCard(taskID, name, description, timeSpent, category, priority, date) {
   let cardDiv =
   "<div class='task-card' id="+ taskID + ">" +
       "<div class='task-header-wrapper'>" +
         "<div class='task-header d-flex'>" +
-          "<div class='p-2 bg-info task-name'>" + name + "</div>" +
-          "<div class='p-2 bg-warning time-spent' id=time-" + taskID +"> Time spent " + fromSecondsToHMS(timeSpent) + "</div>" +
+          "<div class='p-2 task-name'>" + name + "</div>" +
+          "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + fromSecondsToHMS(timeSpent) + "</div>" +
           "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete task</button>" +
         "</div>" +
 
         "<div class='task-body d-flex'>" +
-          "<div class='p-2 bg-info task-name'>Category: " + category + "</div>"+
-          "<div class='p-2 bg-warning priority'>Priority: " + priority + "</div>" +
-          "<div class='p-2 bg-danger date'>" + "finished date: "+ "</div>" +
+          "<div class='p-2 category-name'>Category: " + category + "</div>"+
+          "<div class='p-2 priority'>Priority: " + priority + "</div>" +
+          "<div class='p-2 date-div'>" + "finished date: "+ date + "</div>" +
           "<button class='btn btn-warning p-2 ml-auto completed-button card-buttons'>Mark as uncompleted</button>"+
         "</div>" +
 
@@ -141,21 +135,4 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
   "</div>"
 
   $(".container").prepend(cardDiv)
-}
-
-
-function removeAllCards() {
-  $(".container").empty()
-}
-
-function fromSecondsToHMS(seconds) {
-  let hours = Math.floor(seconds / 3600)
-  let minutes = Math.floor(seconds % 3600 / 60)
-  seconds = Math.floor(seconds % 3600 % 60)
-
-  return hours + ":" + minutes + ":" + seconds
-}
-
-function getIDFromButton(button) {
-  return $(button).parent().parent().parent().attr("id")
 }

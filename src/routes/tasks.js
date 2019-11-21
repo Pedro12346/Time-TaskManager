@@ -2,49 +2,49 @@ let express = require("express")
 let router = express.Router()
 let Task = require("../models/Task.js")
 let moment = require("../helpers/moment.js")
+let {isAuthenticated} = require("../helpers/auth")
 
 //Get pending tasks view
-router.get("/pending-tasks", (req, res) => {
+router.get("/pending-tasks", isAuthenticated, (req, res) => {
   res.render("tasks/pending-tasks")
 })
 
 //Get completed tasks view
-router.get("/completed-tasks", (req, res) => {
+router.get("/completed-tasks",  isAuthenticated, (req, res) => {
   res.render("tasks/completed")
 })
 
 //search tasks by keyword
-router.put("/search", async (req, res) => {
+router.put("/search",  isAuthenticated, async (req, res) => {
   let {keyword, completed} = req.body
   try {
-    let tasks = await Task.find({$text: { $search: keyword}, completed: completed})
-    console.log(tasks)
+    let tasks = await Task.find({$text: { $search: keyword}, completed: completed, userid: req.user.id})
     return res.status(200).json({tasks: tasks})
   } catch (e) {
     return res.status(404)
   }
 })
 
-router.get("/get-pending-tasks", async (req, res) => {
+router.get("/get-pending-tasks",  isAuthenticated, async (req, res) => {
 
   try {
-    let tasks = await Task.find({completed: false})
+    let tasks = await Task.find({completed: false, userid: req.user.id})
     return res.status(200).json({pendingTasks: tasks})
   } catch (e) {
     return res.status(404)
   }
 })
 
-router.get("/get-completed-tasks", async (req, res) => {
+router.get("/get-completed-tasks",  isAuthenticated, async (req, res) => {
   try {
-    let tasks = await Task.find({completed: true})
+    let tasks = await Task.find({completed: true, userid: req.user.id})
     return res.status(200).json({pendingTasks: tasks})
   } catch (e) {
     return res.status(404)
   }
 })
 //Insert a task
-router.post("/insert-task", async (req, res) => {
+router.post("/insert-task",  isAuthenticated, async (req, res) => {
 
   let {name, description, category, priority, dueDate} = req.body
 
@@ -68,8 +68,9 @@ router.post("/insert-task", async (req, res) => {
   timeSpentInSeconds = 0
   completed = false
   completedDate = null
-
   let newTask = new Task({name, description, category, priority, dueDate, timeSpentInSeconds, completed, completedDate})
+  newTask.userid = req.user.id
+
   try {
     await newTask.save()
     return res.status(200).json(newTask)
@@ -79,51 +80,50 @@ router.post("/insert-task", async (req, res) => {
 })
 
 //delete task
-router.delete("/delete-task/:taskID", async (req, res) => {
+router.delete("/delete-task/:taskID",  isAuthenticated, async (req, res) => {
 
   try {
     await Task.findByIdAndDelete(req.params.taskID)
-    return res.status(200).json({taskID: req.params.taskID})
+    return res.status(200).json({_id: req.params.taskID})
   } catch (e) {
     return res.status(404)
   }
 })
 
 //update time spent
-router.put("/update-time-spent", async (req, res) => {
+router.put("/update-time-spent",  isAuthenticated, async (req, res) => {
 
   let {taskID, seconds} = req.body
-  console.log(taskID)
   try {
-    await Task.findOneAndUpdate({_id: taskID}, {$inc: {timeSpentInSeconds: seconds}})
+    await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {$inc: {timeSpentInSeconds: seconds}})
     let updatedTask = await Task.findOne({_id: taskID})
-    return res.status(200).json({taskID: taskID, timeSpentInSeconds: updatedTask.timeSpentInSeconds})
+    return res.status(200).json({_id: taskID, timeSpentInSeconds: updatedTask.timeSpentInSeconds})
   } catch(e) {
     return res.status(500)
   }
 })
 
 //mark a task as completed
-router.put("/complete-task", async (req, res) => {
+router.put("/complete-task",  isAuthenticated, async (req, res) => {
 
   let {taskID, completedDate} = req.body
 
   try {
-    await Task.findOneAndUpdate({_id: taskID}, {completed: true, completedDate: completedDate})
-    return res.status(200).json({taskID: taskID})
+    await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {completed: true, completedDate: completedDate})
+    return res.status(200).json({_id: taskID})
   } catch(e) {
     return res.status(500)
   }
 })
 
 //mark a task as uncompleted
-router.put("/uncomplete-task", async (req, res) => {
+router.put("/uncomplete-task",  isAuthenticated, async (req, res) => {
 
   let {taskID} = req.body
 
   try {
-    await Task.findOneAndUpdate({_id: taskID}, {completed: false, completedDate: null})
-    return res.status(200).json({taskID: taskID})
+    await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {completed: false, completedDate: null})
+    return res.status(200).json({_id: taskID})
   } catch(e) {
     return res.status(500)
   }

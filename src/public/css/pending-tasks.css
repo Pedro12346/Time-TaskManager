@@ -1,60 +1,9 @@
 h1 {
   background-color: #00203b;
-  margin: 0px;
-  height: 60px;
-  text-align: center;
   color: white;
 }
 
-#tab-title {
-  text-align: center;
-  background-color: #f8f9fa;
-  margin: 0px;
-  height: 70px;
-  border-bottom-style: solid;
-  border-top: 1px;
-  border-width: 1px;
-  border-color: black;
-}
-
-#search-button {
-  background-color: #6791a2;
-  color: white;
-}
 #submit-task-button {
   margin-top: 20px;
   margin-bottom: 10px;
-}
-
-.container{
-  margin: 10px 0px;
-}
-.task-card{
-  border-style: solid;
-  border-radius: 25px;
-  border-color: #00BFFF;
-  margin: 10px 0px;
-}
-
-.task-header-wrapper {
-  padding: 10px;
-}
-
-.task-header, .task-body {
-  margin:5px 0;
-}
-
-.card-buttons {
-  width: 15%;
-}
-
-.more-info-button {
-  margin-left: 0px;
-  padding: 0px;
-}
-
-.description-body{
-  margin-top: 15px;
-  margin-bottom: 5px;
-  padding: 10px;
 }

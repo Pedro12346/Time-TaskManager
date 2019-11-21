@@ -134,7 +134,7 @@ function markAsCompleted(taskID) {
       completedDate: completedDate
     },
     success: (responseJSON) => {
-      removeTaskCard(responseJSON.taskID)
+      removeTaskCard(responseJSON._id)
     },
     error: (err) => {
       console.log(err)
@@ -163,7 +163,8 @@ function retrieveTasks() {
 
 function displayTasks(tasks) {
   for(let i = 0; i < tasks.length; i++) {
-    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, tasks[i].dueDate)
+    let date = getFormattedDate(tasks[i].dueDate)
+    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date)
   }
 }
 
@@ -174,7 +175,7 @@ function deleteTask(taskID) {
     method: "DELETE",
     dataType: "JSON",
     success: (responseJSON) => {
-      removeTaskCard(responseJSON.taskID)
+      removeTaskCard(responseJSON._id)
       emptyFields()
     },
     error: (err) => {
@@ -186,20 +187,20 @@ function deleteTask(taskID) {
 /*
 Prepend a pending task card in the container
 */
-function addTaskCard(taskID, name, description, timeSpent, category, priority, dueDate) {
+function addTaskCard(taskID, name, description, timeSpent, category, priority, date) {
   let cardDiv =
   "<div class='task-card' id="+ taskID + ">" +
       "<div class='task-header-wrapper'>" +
         "<div class='task-header d-flex'>" +
-          "<div class='p-2 bg-info task-name'>" + name + "</div>" +
-          "<div class='p-2 bg-warning time-spent' id=time-" + taskID +"> Time spent " + fromSecondsToHMS(timeSpent) + "</div>" +
+          "<div class='p-2 task-name'>" + name + "</div>" +
+          "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + fromSecondsToHMS(timeSpent) + "</div>" +
           "<button class='btn btn-primary p-2 ml-auto tracking-button card-buttons not-tracking'>Start tracking</button>" +
         "</div>" +
 
         "<div class='task-body d-flex'>" +
-          "<div class='p-2 bg-info task-name'>Category: " + category + "</div>"+
-          "<div class='p-2 bg-warning priority'>Priority: " + priority + "</div>" +
-          "<div class='p-2 bg-danger date'>" + "due date: "+ "</div>" +
+          "<div class='p-2 category-name'>Category: " + category + "</div>"+
+          "<div class='p-2 priority'>Priority: " + priority + "</div>" +
+          "<div class='p-2  date'>" + "due date: "+ date + "</div>" +
           "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete task</button>" +
         "</div>" +
 
@@ -219,17 +220,6 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
   $(".container").prepend(cardDiv)
 }
 
-/*
-Remove a task card
-*/
-function removeTaskCard(taskID) {
-  $("#" + taskID).remove()
-}
-
-function removeAllCards() {
-  $(".container").empty()
-}
-
 //send task to DB
 function addTask() {
   let name = $("#name-input").val()
@@ -246,14 +236,14 @@ function addTask() {
     dueDate: dueDate
   }
 
-  console.log(newTask)
   $.ajax({
     url: "http://localhost:" + port + "/insert-task",
     method: "POST",
     dataType: "JSON",
     data: newTask,
     success: (responseJSON) => {
-      addTaskCard(responseJSON.taskID, responseJSON.name, responseJSON.description, responseJSON.timeSpentInSeconds, responseJSON.category ,responseJSON.priority, responseJSON.dueDate)
+      let date = getFormattedDate(responseJSON.dueDate)
+      addTaskCard(responseJSON._id, responseJSON.name, responseJSON.description, responseJSON.timeSpentInSeconds, responseJSON.category ,responseJSON.priority, date)
       emptyFields()
     },
     error: (err) => {
@@ -262,9 +252,6 @@ function addTask() {
   })
 }
 
-function getIDFromButton(button) {
-  return $(button).parent().parent().parent().attr("id")
-}
 
 function emptyFields() {
   $("#name-input").val("")
@@ -272,12 +259,4 @@ function emptyFields() {
   $("#category-input").val("")
   $("#select-input").val("Low")
   $("#date-input").val("")
-}
-
-function fromSecondsToHMS(seconds) {
-  let hours = Math.floor(seconds / 3600)
-  let minutes = Math.floor(seconds % 3600 / 60)
-  seconds = Math.floor(seconds % 3600 % 60)
-
-  return hours + ":" + minutes + ":" + seconds
 }

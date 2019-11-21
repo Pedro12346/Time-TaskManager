@@ -9,7 +9,7 @@ aside {
   padding: 0px;
   background-color: #007bff;
   flex-basis: 18%;
-  height: 850px;
+  height: 870px;
 }
 
 a {
@@ -18,11 +18,79 @@ a {
   color: white;
 }
 
-#first-row {
-  margin-top: 70px;
+h1 {
+  margin: 0px;
+  height: 60px;
+  text-align: center;
 }
 
 main {
   height: 850px;
   flex-basis: 82%;
+}
+
+#first-row {
+  margin-top: 70px;
+}
+
+#search-button {
+  background-color: #6791a2;
+  color: white;
+}
+
+.category-name {
+  background-color: rgb(224, 255, 255);
+  border-radius: 20px;
+}
+
+.task-name {
+  background-color: rgb(0, 77, 153);
+  border-radius: 20px;
+  color: white;
+}
+
+.priority {
+  background-color: rgb(255, 162, 128);
+  border-radius: 20px;
+  color: white;
+}
+
+.time-spent {
+  margin-left: 20px;
+  background-color: rgb(234, 234, 251);
+  border-radius: 20px;
+}
+
+.task-card:hover {
+  background-color: rgb(0, 0, 139, 0.1);
+}
+
+.task-card{
+  border-style: solid;
+  border-radius: 25px;
+  border-color: #8080ff;
+  border-width: 2px;
+  margin: 10px 0px;
+}
+
+.task-header-wrapper {
+  padding: 10px;
+}
+
+.task-header, .task-body {
+  margin:5px 0;
+}
+
+.card-buttons {
+  width: 15%;
+}
+
+.description-body{
+  margin-top: 15px;
+  margin-bottom: 5px;
+  padding: 10px;
+}
+
+.container{
+  margin: 10px 0px;
 }

@@ -4,14 +4,18 @@ let hbs = require("express-handlebars")
 let methodOverride = require("method-override")
 let session = require("express-session")
 require("dotenv").config()
+let passport = require("passport")
 
 //Inits
 require("./config/database")
+require("./config/passport")
+
 let app = express()
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+  res.header("Access-Control-Allow-Credentials", "true")
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
   next();
 })
@@ -32,13 +36,14 @@ app.set("view engine", ".hbs")
 
 //Middlewares
 app.use(express.urlencoded({extended:true}))
-
 app.use(methodOverride("_method"))
 app.use(session({
   secret: "s_app",
   resave: true,
   saveUninitialized: true
 }))
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 //Global variables

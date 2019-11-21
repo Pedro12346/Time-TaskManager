@@ -8,7 +8,8 @@ let taskSchema =  new mongoose.Schema({
   dueDate: {type: Date, default: null},
   timeSpentInSeconds: {type: Number, required: true},
   completed: {type: Boolean, required: true},
-  completedDate: {type: Date, default: null}
+  completedDate: {type: Date, default: null},
+  userid: {type: String, required: true}
 })
 
 
