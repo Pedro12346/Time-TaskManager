@@ -1,9 +1,12 @@
-let port = "8080"
-let startTime, endTime
+import ServerRequest from "./ServerRequest.js"
+import {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, removeTaskCard, emptyFields} from "./Utils.js"
+let port = "8080";
+let startTime, endTime;
+let serverRequest = new ServerRequest(port);
 
 $(document).ready(() => {
 
-  retrieveTasks()
+  retrieveTasks();
 
   $("#date-input").on("click", () => {
     $(".due-date").datepicker({
@@ -85,20 +88,18 @@ function searchTask(keyword) {
 }
 
 function startTracking(taskID, button) {
-
-  startTime = new Date()
-
+  startTime = new Date();
   //change appereance
-  button.removeClass("btn-success").removeClass("not-tracking").addClass("btn-warning").addClass("tracking")
-  button.text("Stop tracking")
+  button.removeClass("btn-success").removeClass("not-tracking").addClass("btn-warning").addClass("tracking");
+  button.text("Stop tracking");
 }
 
 function stopTracking(taskID, button) {
   //calculate how much time was spent in this task
-  endTime = new Date()
-  let difference = endTime - startTime
-  difference /= 1000
-  let seconds = Math.round(difference)
+  endTime = new Date();
+  let difference = endTime - startTime;
+  difference /= 1000;
+  let seconds = Math.round(difference);
 
   $.ajax({
     url: "http://localhost:" + port + "/update-time-spent",
@@ -109,79 +110,61 @@ function stopTracking(taskID, button) {
       seconds: seconds
     },
     success: (responseJSON) => {
-      $("#time-" + taskID).text("Time spent " + fromSecondsToHMS(responseJSON.timeSpentInSeconds))
+      $("#time-" + taskID).text("Time spent " + fromSecondsToHMS(responseJSON.timeSpentInSeconds));
     },
     error: (err) => {
-      console.log(err)
+      console.log(err);
     }
 
   })
 
   //change appereance and class names
-  button.removeClass("btn-warning").removeClass("tracking").addClass("btn-primary").addClass("not-tracking")
-  button.text("Start tracking")
+  button.removeClass("btn-warning").removeClass("tracking").addClass("btn-primary").addClass("not-tracking");
+  button.text("Start tracking");
 }
 
 function markAsCompleted(taskID) {
-  let completedDate = Date.now()
-
-  $.ajax({
-    url: "http://localhost:" + port + "/complete-task",
-    method: "PUT",
-    dataType: "JSON",
-    data: {
-      taskID: taskID,
-      completedDate: completedDate
-    },
-    success: (responseJSON) => {
-      removeTaskCard(responseJSON._id)
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.markTaskAsCompleted(taskID).then((response) => {
+    if(response.status == "success") {
+      removeTaskCard(taskID);
+    } else {
+      console.log("Error");
     }
-
-  })
+  });
 }
 
 /*
 Get all pending tasks from db
 */
 function retrieveTasks() {
-  $.ajax({
-    url: "http://localhost:" + port + "/get-pending-tasks",
-    method: "GET",
-    dataType: "JSON",
-    success: (responseJSON) => {
-      displayTasks(responseJSON.pendingTasks)
-      emptyFields()
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.retrievePendingTasks().then((response) => {
+    if(response.status == "success") {
+      let tasks = response.body;
+      displayTasks(tasks);
+      emptyFields();
+    } else {
+      console.log("Error");
     }
-  })
+  });
 }
 
 function displayTasks(tasks) {
   for(let i = 0; i < tasks.length; i++) {
-    let date = getFormattedDate(tasks[i].dueDate)
-    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date)
+    let date = getFormattedDate(tasks[i].dueDate);
+    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date);
   }
 }
 
 //delete task from db
 function deleteTask(taskID) {
-  $.ajax({
-    url: "http://localhost:" + port + "/delete-task/" + taskID,
-    method: "DELETE",
-    dataType: "JSON",
-    success: (responseJSON) => {
-      removeTaskCard(responseJSON._id)
-      emptyFields()
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.deleteTask(taskID).then((response) => {
+    if(response.status == "success") {
+      removeTaskCard(taskID);
+      emptyFields();
+    } else {
+      console.log("Error");
     }
-  })
+  });
 }
 
 /*
@@ -228,7 +211,7 @@ function addTask() {
   let priority = $("#select-input").val()
   let dueDate = $("#date-input").val()
 
-  let newTask = {
+  let task = {
     name: name,
     description: description,
     category: category,
@@ -236,27 +219,14 @@ function addTask() {
     dueDate: dueDate
   }
 
-  $.ajax({
-    url: "http://localhost:" + port + "/insert-task",
-    method: "POST",
-    dataType: "JSON",
-    data: newTask,
-    success: (responseJSON) => {
-      let date = getFormattedDate(responseJSON.dueDate)
-      addTaskCard(responseJSON._id, responseJSON.name, responseJSON.description, responseJSON.timeSpentInSeconds, responseJSON.category ,responseJSON.priority, date)
-      emptyFields()
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.addTask(task).then((response) => {
+
+    if(response.status == "success") {
+      let newTask = response.body;
+      addTaskCard(newTask._id, newTask.name, newTask.description, newTask.timeSpentInSeconds, newTask.category ,newTask.priority, newTask.dueDate);
+      emptyFields();
+    } else {
+      console.log("Error");
     }
   })
-}
-
-
-function emptyFields() {
-  $("#name-input").val("")
-  $("#description-input").val("")
-  $("#category-input").val("")
-  $("#select-input").val("Low")
-  $("#date-input").val("")
 }

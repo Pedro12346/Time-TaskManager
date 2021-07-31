@@ -3,13 +3,15 @@ let path = require("path")
 let hbs = require("express-handlebars")
 let methodOverride = require("method-override")
 let session = require("express-session")
-require("dotenv").config()
 let passport = require("passport")
 
 //Inits
+require("dotenv").config()
 require("./config/database")
 require("./config/passport")
 
+console.log("port = ",  process.env.PORT);
+console.log("mongo_string", process.env.MONGO_CONECTION_STRING);
 let app = express()
 
 app.use(function(req, res, next) {

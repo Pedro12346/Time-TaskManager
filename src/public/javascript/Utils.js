@@ -27,3 +27,13 @@ Remove a task card view
 function removeTaskCard(taskID) {
   $("#" + taskID).remove()
 }
+
+function emptyFields() {
+  $("#name-input").val("")
+  $("#description-input").val("")
+  $("#category-input").val("")
+  $("#select-input").val("Low")
+  $("#date-input").val("")
+}
+
+export {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, removeTaskCard, emptyFields, }

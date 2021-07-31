@@ -1,4 +1,7 @@
-let port = "8080"
+import ServerRequest from "./ServerRequest.js"
+let port= "8080"
+let serverRequest = new ServerRequest(port);
+
 
 $(document).ready(() => {
   $("#create-account-button").on("click", (event) => {
@@ -10,26 +13,18 @@ $(document).ready(() => {
   })
 })
 
-
-
 function register(email, password, confirmPassword) {
-
   let user = {
     email: email,
     password: password,
     confirmPassword: confirmPassword
   }
 
-  $.ajax({
-    url: "http://localhost:" + port + "/users/signup",
-    method: "POST",
-    dataType: "JSON",
-    data: user,
-    success: (responseJSON) => {
-      displaySuccessRegisterMessage()
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.register(user).then((response) => {
+    if(response.status == "success") {
+      displaySuccessRegisterMessage();
+    } else {
+      console.log("Error");
     }
   })
 }

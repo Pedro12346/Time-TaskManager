@@ -1,4 +1,7 @@
-let port="8080"
+import ServerRequest from "./ServerRequest.js"
+let port= "8080"
+let serverRequest = new ServerRequest(port);
+
 $(document).ready(() => {
   $("#login-button").on("click", (event) => {
     event.preventDefault()
@@ -13,16 +16,11 @@ function login(email, password) {
     email: email,
     password: password
   }
-
-  $.ajax({
-    url: "http://localhost:" + port + "/users/login",
-    method: "POST",
-    data: credentials,
-    success: (responseJSON) => {
-      window.location.replace("/pending-tasks")
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.login(credentials).then((response) => {
+    if(response.status == "success") {
+      window.location.replace("/pending-tasks");
+    } else {
+      console.log("Error");
     }
   })
 }

@@ -1,26 +1,30 @@
+import ServerRequest from "./ServerRequest.js"
+import {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, removeTaskCard, emptyFields} from "./Utils.js"
+
 let port = "8080"
+let serverRequest = new ServerRequest(port);
 
 $(document).ready(() => {
-  retrieveTasks()
+  retrieveTasks();
 
   //add click event to search button
   $("#search-button").on("click", (event) => {
-    event.preventDefault()
-    let keyword = $("#search-input").val()
-    searchTask(keyword)
+    event.preventDefault();
+    let keyword = $("#search-input").val();
+    searchTask(keyword);
   })
 
   //add click event to delete button
   $(".container").on("click", ".delete-button", (event) => {
-    event.preventDefault()
-    let taskID = getIDFromButton(event.target)
-    deleteTask(taskID)
+    event.preventDefault();
+    let taskID = getIDFromButton(event.target);
+    deleteTask(taskID);
   })
 
   //add click event to uncompleted buttton
   $(".container").on("click", ".completed-button", (event) => {
-    event.preventDefault()
-    let taskID = getIDFromButton(event.target)
+    event.preventDefault();
+    let taskID = getIDFromButton(event.target);
     markAsUncompleted(taskID);
   })
 
@@ -38,62 +42,45 @@ function searchTask(keyword) {
       completed: true
     },
     success: (responseJSON) => {
-      removeAllCards()
-      displayTasks(responseJSON.tasks)
+      removeAllCards();
+      displayTasks(responseJSON.tasks);
     },
     error: (err) => {
     }
-  })
+  });
 }
 
-
 function markAsUncompleted(taskID) {
-
-  $.ajax({
-    url: "http://localhost:" + port + "/uncomplete-task",
-    method: "PUT",
-    dataType: "JSON",
-    data: {
-      taskID: taskID,
-    },
-    success: (responseJSON) => {
-      removeTaskCard(responseJSON._id)
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.markTaskAsUncompleted(taskID).then((response) => {
+    if(response.status == "success") {
+      removeTaskCard(taskID);
+    } else {
+      console.log("Error");
     }
-
-  })
+  });
 }
 
 //delete task from db
 function deleteTask(taskID) {
-  $.ajax({
-    url: "http://localhost:" + port + "/delete-task/" + taskID,
-    method: "DELETE",
-    dataType: "JSON",
-    success: (responseJSON) => {
-      removeTaskCard(responseJSON._id)
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.deleteTask(taskID).then((response) => {
+    if(response.status == "success") {
+      removeTaskCard(taskID);
+    } else {
+      console.log("Error");
     }
-  })
+  });
 }
 
 
 function retrieveTasks() {
-  $.ajax({
-    url: "http://localhost:" + port + "/get-completed-tasks",
-    method: "GET",
-    dataType: "JSON",
-    success: (responseJSON) => {
-      displayTasks(responseJSON.pendingTasks)
-    },
-    error: (err) => {
-      console.log(err)
+  serverRequest.retrieveCompletedTasks().then((response) => {
+    if(response.status == "success") {
+      let tasks = response.body;
+      displayTasks(tasks);
+    } else {
+      console.log("Error")
     }
-  })
+  });
 }
 
 
@@ -134,5 +121,5 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
       "</div>" +
   "</div>"
 
-  $(".container").prepend(cardDiv)
+  $(".container").prepend(cardDiv);
 }

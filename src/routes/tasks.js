@@ -26,10 +26,10 @@ router.put("/search",  isAuthenticated, async (req, res) => {
 })
 
 router.get("/get-pending-tasks",  isAuthenticated, async (req, res) => {
-
+  console.log("get pending tasks")
   try {
     let tasks = await Task.find({completed: false, userid: req.user.id})
-    return res.status(200).json({pendingTasks: tasks})
+    return res.status(200).json({tasks: tasks})
   } catch (e) {
     return res.status(404)
   }
@@ -38,14 +38,14 @@ router.get("/get-pending-tasks",  isAuthenticated, async (req, res) => {
 router.get("/get-completed-tasks",  isAuthenticated, async (req, res) => {
   try {
     let tasks = await Task.find({completed: true, userid: req.user.id})
-    return res.status(200).json({pendingTasks: tasks})
+    return res.status(200).json({tasks: tasks})
   } catch (e) {
     return res.status(404)
   }
 })
 //Insert a task
 router.post("/insert-task",  isAuthenticated, async (req, res) => {
-
+  console.log("/insert-task")
   let {name, description, category, priority, dueDate} = req.body
 
   //validate task name
