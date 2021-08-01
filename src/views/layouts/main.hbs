@@ -18,18 +18,20 @@
   <body>
 
     <div class="container-fluid">
-
       <!-- sidebar menu-->
       <aside class="nav flex-row">
         <ul class="nav flex-column" >
-          <li class="nav-item" id="first-row">
-            <a class="nav-link active" href="/pending-tasks">Tasks</a>
+          <li id="first-row">
+            <p id="nav-title">Lists</p>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/completed-tasks">Completed</a>
+            <a class="nav-link not-active a-pending" href="/pending-tasks">Tasks</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
+            <a class="nav-link not-active a-completed" href="/completed-tasks">Completed</a>
+          </li>
+          <li class="nav-item" id="last-row" >
+            <button type="button" class="btn btn-danger" id="logout-btn"><a href="/logout">Logout</a></button>
           </li>
         </ul>
       </aside>

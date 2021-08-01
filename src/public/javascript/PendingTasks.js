@@ -3,6 +3,7 @@ import {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, rem
 let port = "8080";
 let startTime, endTime;
 let serverRequest = new ServerRequest(port);
+$(".a-pending").removeClass("not-active").addClass("active");
 
 $(document).ready(() => {
 

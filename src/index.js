@@ -10,8 +10,6 @@ require("dotenv").config()
 require("./config/database")
 require("./config/passport")
 
-console.log("port = ",  process.env.PORT);
-console.log("mongo_string", process.env.MONGO_CONECTION_STRING);
 let app = express()
 
 app.use(function(req, res, next) {

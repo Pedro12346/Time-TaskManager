@@ -7,21 +7,57 @@
 aside {
   margin: 0px;
   padding: 0px;
-  background-color: #007bff;
+  background-color: #FFFFFF;
   flex-basis: 18%;
   height: 870px;
+  box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.1);
+}
+
+.flex-column {
+  width: 100%;
+}
+
+.active {
+  background-color: rgb(135, 206, 250, 0.2);
+  border-radius: 10px;
+  margin: 0 10px;
+}
+
+.not-active:hover {
+  background-color: rgb(211, 211, 211, 0.3);
+  border-radius: 10px;
+  margin: 0 10px;
+}
+
+.nav-item:hover > a{
+  font-size: 18px;
 }
 
 a {
   font-family: "Helvetica", sans-serif;
-  font-size: 22px;
-  color: white;
+  font-size: 18px;
+  color: #4169E1;
+}
+
+#logout-btn {
+  width: 100%;
+}
+
+#logout-btn > a {
+  color: #FFFFFF;
+}
+
+#nav-title {
+  color: #00008B;
+  font-size: 25px;
+  margin: 0 10px;;
 }
 
 h1 {
-  margin: 0px;
+  margin: 15px 0px 0px 20px;
   height: 60px;
-  text-align: center;
+  text-align: left;
+  color: #00008B;
 }
 
 main {
@@ -30,7 +66,11 @@ main {
 }
 
 #first-row {
-  margin-top: 70px;
+  margin-top: 100px;
+}
+
+#last-row {
+  margin-top: 300px;
 }
 
 #search-button {

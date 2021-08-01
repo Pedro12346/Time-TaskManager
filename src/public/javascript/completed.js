@@ -3,6 +3,7 @@ import {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, rem
 
 let port = "8080"
 let serverRequest = new ServerRequest(port);
+$(".a-completed").removeClass("not-active").addClass("active");
 
 $(document).ready(() => {
   retrieveTasks();
