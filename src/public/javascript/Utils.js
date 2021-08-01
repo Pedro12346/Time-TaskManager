@@ -36,4 +36,29 @@ function emptyFields() {
   $("#date-input").val("")
 }
 
-export {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, removeTaskCard, emptyFields, }
+function removeActivesFromSortDropdown() {
+  let sortBy = ["added", "due", "priority", "category"];
+
+  for(let i = 0; i < sortBy.length; i++) {
+    $(".dropdown-" + sortBy[i]).removeClass("active");
+  }
+}
+
+function currentSortInDropdown() {
+  let sortBy = ["added", "due", "priority", "category"];
+
+  for(let i = 0; i < sortBy.length; i++) {
+    if($(".dropdown-" + sortBy[i]).hasClass("active")) {
+      return sortBy[i];
+    }
+  }
+  return "";
+}
+export {getFormattedDate,
+  fromSecondsToHMS,
+  getIDFromButton,
+  removeAllCards,
+  removeTaskCard,
+  emptyFields,
+  removeActivesFromSortDropdown,
+  currentSortInDropdown}

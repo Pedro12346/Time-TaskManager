@@ -2,18 +2,28 @@
   <h1>Completed</h1>
 
   <!-- options bar-->
-  <nav class="navbar navbar-light bg-light">
+  <nav class="nav navbar-light bg-light">
 
-    <form class="form-inline">
-      <input class="form-control mr-sm-2" id="search-input" placeholder="Search task" aria-label="Search">
-      <button type="button" class="btn" id="search-button">Search</button>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control" id="search-input" placeholder="Search" placeholder="Search" aria-label="Search">
     </form>
 
+    <div class="dropdown nav-dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Sort
+      </button>
+      <div class="dropdown-menu" aria-labelledby="sort-menu">
+        <a class="dropdown-item dropdown-added active" href="#">Added date</a>
+        <a class="dropdown-item dropdown-due" href="#">Due date</a>
+        <a class="dropdown-item dropdown-priority" href="#">Priority</a>
+        <a class="dropdown-item dropdown-category" href="#">Category</a>
+      </div>
+    </div>
   </nav>
+
 </header>
 
 <div class="container">
 
 </div>
-<link rel="stylesheet" href="/css/completed.css">
 <script type="module" type="text/javascript" src="/javascript/Completed.js"> </script>

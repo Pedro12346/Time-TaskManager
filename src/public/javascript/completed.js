@@ -1,11 +1,28 @@
 import ServerRequest from "./ServerRequest.js"
-import {getFormattedDate, fromSecondsToHMS, getIDFromButton, removeAllCards, removeTaskCard, emptyFields} from "./Utils.js"
+import {getFormattedDate,
+  fromSecondsToHMS,
+  getIDFromButton,
+  removeAllCards,
+  removeTaskCard,
+  emptyFields,
+  removeActivesFromSortDropdown,
+  currentSortInDropdown} from "./Utils.js"
+
+import {
+  sortTasksByDueDate,
+  sortTasksByPriority,
+  sortTasksByCategory,
+  sortTasksByAddedDate} from "./Algorithm.js"
 
 let port = "8080"
 let serverRequest = new ServerRequest(port);
-$(".a-completed").removeClass("not-active").addClass("active");
+let tasks = [];
 
 $(document).ready(() => {
+
+  $(".a-completed").removeClass("not-active").addClass("active");
+  $(".dropdown-added").addClass("active");
+
   retrieveTasks();
 
   //add click event to search button
@@ -29,6 +46,30 @@ $(document).ready(() => {
     markAsUncompleted(taskID);
   })
 
+  $(".nav-dropdown").on("click", ".dropdown-added", (event) => {
+    removeActivesFromSortDropdown();
+    $(".dropdown-added").addClass("active");
+    sortBy("added");
+  })
+
+  $(".nav-dropdown").on("click", ".dropdown-due", (event) => {
+    removeActivesFromSortDropdown();
+    $(".dropdown-due").addClass("active");
+    sortBy("due");
+  })
+
+  $(".nav-dropdown").on("click", ".dropdown-priority", (event) => {
+    removeActivesFromSortDropdown();
+    $(".dropdown-priority").addClass("active");
+    sortBy("priority");
+  })
+
+  $(".nav-dropdown").on("click", ".dropdown-category", (event) => {
+    removeActivesFromSortDropdown();
+    $(".dropdown-category").addClass("active");
+    sortBy("category");
+  })
+
 })
 
 
@@ -43,7 +84,6 @@ function searchTask(keyword) {
       completed: true
     },
     success: (responseJSON) => {
-      removeAllCards();
       displayTasks(responseJSON.tasks);
     },
     error: (err) => {
@@ -76,7 +116,7 @@ function deleteTask(taskID) {
 function retrieveTasks() {
   serverRequest.retrieveCompletedTasks().then((response) => {
     if(response.status == "success") {
-      let tasks = response.body;
+      tasks = response.body;
       displayTasks(tasks);
     } else {
       console.log("Error")
@@ -86,8 +126,12 @@ function retrieveTasks() {
 
 
 function displayTasks(tasks) {
+  removeAllCards();
   for(let i = 0; i < tasks.length; i++) {
-    let date = getFormattedDate(tasks[i].completedDate)
+    let date = "N/A";
+    if(tasks[i].dueDate != null) {
+      date = getFormattedDate(tasks[i].dueDate);
+    }
     addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date)
   }
 }
@@ -100,7 +144,7 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
         "<div class='task-header d-flex'>" +
           "<div class='p-2 task-name'>" + name + "</div>" +
           "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + fromSecondsToHMS(timeSpent) + "</div>" +
-          "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete task</button>" +
+          "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete</button>" +
         "</div>" +
 
         "<div class='task-body d-flex'>" +
@@ -123,4 +167,19 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
   "</div>"
 
   $(".container").prepend(cardDiv);
+}
+
+function sortBy(sort) {
+  let sortedTasks = tasks;
+
+  if(sort == "added") {
+    sortedTasks = sortTasksByAddedDate(tasks);
+  } else if(sort == "due") {
+    sortedTasks = sortTasksByDueDate(tasks);
+  } else if(sort == "priority") {
+    sortedTasks = sortTasksByPriority(tasks);
+  } else if(sort == "category") {
+    sortedTasks = sortTasksByCategory(tasks);
+  }
+  displayTasks(sortedTasks);
 }

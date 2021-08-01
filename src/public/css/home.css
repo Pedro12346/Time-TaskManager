@@ -17,7 +17,7 @@ aside {
   width: 100%;
 }
 
-.active {
+li > .active {
   background-color: rgb(135, 206, 250, 0.2);
   border-radius: 10px;
   margin: 0 10px;
@@ -33,7 +33,7 @@ aside {
   font-size: 18px;
 }
 
-a {
+aside > a {
   font-family: "Helvetica", sans-serif;
   font-size: 18px;
   color: #4169E1;
@@ -73,9 +73,18 @@ main {
   margin-top: 300px;
 }
 
-#search-button {
-  background-color: #6791a2;
-  color: white;
+#search-input {
+  margin: 0px 0px 0px 15px;
+  color: black;
+}
+
+.nav-dropdown {
+  margin: 0px 0px 0px 50px;
+}
+
+#add-task-button {
+  margin-left: auto;
+  margin-right: 15px;
 }
 
 .category-name {

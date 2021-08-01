@@ -52,9 +52,7 @@ class ServerRequest {
       data: task,
       success: (responseJSON) => {
         response.status = "success";
-        task._id = responseJSON._id;
-        task.timeSpentInSeconds = responseJSON.timeSpentInSeconds;
-        response.body = task;
+        response.body = responseJSON;
       },
       error: (err) => {
         console.log(err);

@@ -2,15 +2,25 @@
   <h1>Tasks</h1>
 
   <!-- options bar-->
-  <nav class="navbar navbar-light bg-light">
+  <nav class="nav nav-light bg-light">
 
-    <form class="form-inline">
-      <input class="form-control mr-sm-2" id="search-input" placeholder="Search task" aria-label="Search">
-      <button type="button" class="btn" id="search-button">Search</button>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control" id="search-input" placeholder="Search" placeholder="Search" aria-label="Search">
     </form>
 
-    <button type="button" class="btn btn-primary" id="add-task-button" data-toggle="modal" data-target="#task-modal">Add task</button>
+    <div class="dropdown nav-dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Sort
+      </button>
+      <div class="dropdown-menu" aria-labelledby="sort-menu">
+        <a class="dropdown-item dropdown-added active" href="#">Added date</a>
+        <a class="dropdown-item dropdown-due" href="#">Due date</a>
+        <a class="dropdown-item dropdown-priority" href="#">Priority</a>
+        <a class="dropdown-item dropdown-category" href="#">Category</a>
+      </div>
+    </div>
 
+    <button type="button" class="btn btn-primary" id="add-task-button" data-toggle="modal" data-target="#task-modal">Add</button>
     <!-- add task modal -->
     <div class="modal" tabindex="-1" role="dialog" id="task-modal">
       <div class="modal-dialog" role="document">
@@ -18,7 +28,7 @@
         <!-- content-->
         <div class="modal-content">
           <div class="modal-header">
-            <h2 class="modal-title">Task description</h2>
+            <h2 class="modal-title">Add task</h2>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true" >&times;</span>
             </button>
@@ -56,7 +66,7 @@
                   <input type="text" name="due-date" id= "date-input" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
               </div>
 
-              <button class="btn btn-success btn-block" type="submit" id="submit-task-button" data-dismiss="modal" aria-label="Close" disabled>Add Task </button>
+              <button class="btn btn-success btn-block" type="submit" id="submit-task-button" data-dismiss="modal" aria-label="Close" disabled>Add</button>
             </form>
           </div>
         </div>

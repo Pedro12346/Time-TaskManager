@@ -67,11 +67,12 @@ router.post("/insert-task",  isAuthenticated, async (req, res) => {
   completedDate = null;
   let newTask = new Task({name, description, category, priority, dueDate, timeSpentInSeconds, completed, completedDate});
   newTask.userid = req.user.id;
-
+  newTask.addedOn = new Date();
   try {
     await newTask.save();
     return res.status(200).json(newTask);
   } catch (e) {
+    console.log(e);
     return res.status(500);
   }
 })
