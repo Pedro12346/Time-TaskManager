@@ -96,6 +96,11 @@ function addSortDropdownEvents(sortBy) {
   })
 }
 
+function addSearchInputEvent(filterTasks) {
+  $("#search-input").on("keyup", () => {
+    filterTasks($("#search-input").val());
+  })
+}
 
 export {
   addSortDropdownEvents,
@@ -106,4 +111,5 @@ export {
   addCreateTaskButtonEvent,
   addDisableAddButtonIfEmptyEvent,
   addChangeDateFormateEvent,
+  addSearchInputEvent
  }

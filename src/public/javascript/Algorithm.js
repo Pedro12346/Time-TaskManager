@@ -34,4 +34,21 @@ function sortTasksByCategory(tasks) {
   });
 }
 
-export {sortTasksByDueDate, sortTasksByPriority, sortTasksByCategory, sortTasksByAddedDate}
+function filterTasks(keyword, tasks) {
+  let filteredTasks = [];
+
+  for(let i = 0; i < tasks.length; i++) {
+    if(tasks[i].name.indexOf(keyword) > -1) {
+      filteredTasks.push(tasks[i]);
+    }
+  }
+
+  return filteredTasks;
+}
+
+export {
+  sortTasksByDueDate,
+  sortTasksByPriority,
+  sortTasksByCategory,
+  sortTasksByAddedDate,
+  filterTasks}

@@ -16,6 +16,7 @@ $(document).ready(() => {
 
   retrieveTasks();
 
+  events.addSearchInputEvent(filterTasks);
   events.addChangeDateFormateEvent();
   events.addDisableAddButtonIfEmptyEvent();
   events.addCreateTaskButtonEvent(addTask);
@@ -26,21 +27,9 @@ $(document).ready(() => {
 })
 
 
-function searchTask(keyword) {
-  $.ajax({
-    url: "http://localhost:" + port + "/search",
-    method: "PUT",
-    dataType: "JSON",
-    data: {
-      keyword: keyword,
-      completed: false
-    },
-    success: (responseJSON) => {
-      UIutils.displayTasks(responseJSON.tasks, "tasks");
-    },
-    error: (err) => {
-    }
-  })
+function filterTasks(keyword) {
+  let filteredTasks = algorithm.filterTasks(keyword, tasks);
+  UIutils.displayTasks(filteredTasks);
 }
 
 function startTracking(taskID, button) {
@@ -97,8 +86,8 @@ function retrieveTasks() {
 function deleteTask(taskID) {
   serverRequest.deleteTask(taskID).then((response) => {
     if(response.status == "success") {
-      utils.removeTaskCard(taskID);
-      utils.emptyFields();
+      UIutils.removeTaskCard(taskID);
+      UIutils.emptyFields();
     } else {
       console.log("Error");
     }
@@ -125,8 +114,8 @@ function addTask() {
     if(response.status == "success") {
       let newTask = response.body;
       tasks.push(newTask);
-      sortBy(utils.currentSortInDropdown());
-      utils.emptyFields();
+      sortBy(UIutils.currentSortInDropdown());
+      UIutils.emptyFields();
     } else {
       console.log("Error");
     }

@@ -14,28 +14,15 @@ $(document).ready(() => {
 
   retrieveTasks();
 
+  events.addSearchInputEvent(filterTasks);
   events.addDeleteButtonEvent(deleteTask);
   events.addUncompletedTaskEvent(markAsUncompleted)
   events.addSortDropdownEvents(sortBy);
 })
 
-
-function searchTask(keyword) {
-
-  $.ajax({
-    url: "http://localhost:" + port + "/search",
-    method: "PUT",
-    dataType: "JSON",
-    data: {
-      keyword: keyword,
-      completed: true
-    },
-    success: (responseJSON) => {
-      UIutilsdisplayTasks(responseJSON.tasks, "completed");
-    },
-    error: (err) => {
-    }
-  });
+function filterTasks(keyword) {
+  let filteredTasks = algorithm.filterTasks(keyword, tasks);
+  UIutils.displayTasks(filteredTasks);
 }
 
 function markAsUncompleted(taskID) {
