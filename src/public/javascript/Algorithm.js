@@ -1,4 +1,3 @@
-
 function sortTasksByAddedDate(tasks) {
   return tasks.sort((first, second) => {
     return new Date(first.addedOn) - new Date(second.addedOn);
@@ -30,11 +29,9 @@ function sortTasksByCategory(tasks) {
     } else if(second.category == "") {
       return true;
     }
-    
+
     return first.category.toLowerCase() < second.category.toLowerCase();
   });
 }
-
-
 
 export {sortTasksByDueDate, sortTasksByPriority, sortTasksByCategory, sortTasksByAddedDate}

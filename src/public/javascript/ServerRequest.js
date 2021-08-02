@@ -6,7 +6,6 @@ class ServerRequest {
 
   async retrieveCompletedTasks() {
     let response = {};
-    let tasks;
     await $.ajax({
       url: "http://localhost:" + this.port + "/get-completed-tasks",
       method: "GET",
@@ -25,7 +24,6 @@ class ServerRequest {
 
   async retrievePendingTasks() {
     let response = {};
-    let tasks;
     await $.ajax({
       url: "http://localhost:" + this.port + "/get-pending-tasks",
       method: "GET",
@@ -127,8 +125,30 @@ class ServerRequest {
     return response;
   }
 
+  async updateTimeSpent(taskID, seconds) {
+    let response = {};
+    await $.ajax({
+      url: "http://localhost:" + this.port + "/update-time-spent",
+      method: "PUT",
+      dataType: "JSON",
+      data: {
+        taskID: taskID,
+        seconds: seconds
+      },
+      success: (responseJSON) => {
+        response.status = "success";
+        response.body = responseJSON.timeSpentInSeconds;
+      },
+      error: (err) => {
+        response.status = "error";
+        console.log(err);
+      }
+    })
+
+    return response;
+  }
+
   async login(credentials) {
-    let completed = undefined;
     let response = {};
     await $.ajax({
       url: "http://localhost:" + this.port + "/users/login",
@@ -146,7 +166,6 @@ class ServerRequest {
   }
 
   async register(user) {
-    let completed = undefined;
     let response = {};
     await $.ajax({
       url: "http://localhost:" + this.port + "/users/signup",
@@ -155,7 +174,6 @@ class ServerRequest {
       data: user,
       success: (responseJSON) => {
         response.status = "success";
-        completed = true;
       },
       error: (err) => {
         response.status = "error";

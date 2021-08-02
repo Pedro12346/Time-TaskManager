@@ -1,18 +1,8 @@
 import ServerRequest from "./ServerRequest.js"
-import {
-  getFormattedDate,
-  fromSecondsToHMS,
-  getIDFromButton,
-  removeAllCards,
-  removeTaskCard,
-  emptyFields,
-  removeActivesFromSortDropdown,
-  currentSortInDropdown} from "./Utils.js"
-import {
- sortTasksByDueDate,
- sortTasksByPriority,
- sortTasksByCategory,
- sortTasksByAddedDate} from "./Algorithm.js"
+import * as UIutils from "./UIutils.js"
+import * as timeUtils from "./TimeUtils.js"
+import * as algorithm from "./Algorithm.js"
+import * as events from "./Event.js"
 
 let port = "8080";
 let startTime, endTime;
@@ -26,87 +16,13 @@ $(document).ready(() => {
 
   retrieveTasks();
 
-  $("#date-input").on("click", () => {
-    $(".due-date").datepicker({
-      format: "dd/mm/yyyy",
-    });
-  })
-
-  //disable add button if task field is empty
-  $("#name-input").keyup(() => {
-    let isDisabled = true;
-
-    if($("#name-input").val().length > 0) {
-      isDisabled = false;
-    }
-
-    $("#submit-task-button").attr("disabled", isDisabled);
-  })
-
-  //add click event to search button
-  $("#search-button").on("click", (event) => {
-    event.preventDefault();
-    let keyword = $("#search-input").val();
-    searchTask(keyword);
-  })
-
-  //add click event to add task button
-  $("#submit-task-button").on("click", (event) => {
-    event.preventDefault();
-    addTask();
-  })
-
-  //add click event to delete button
-  $(".container").on("click", ".delete-button", (event) => {
-    event.preventDefault();
-    let taskID = getIDFromButton(event.target);
-    deleteTask(taskID);
-  })
-
-  //add click event to start tracking button
-  $(".container").on("click", ".tracking-button", (event) => {
-    event.preventDefault();
-
-    let isBeingTracked = $(event.target).hasClass("tracking");
-    let taskID = getIDFromButton(event.target);
-
-    if(isBeingTracked) {
-      stopTracking(taskID,  $(event.target));
-    } else {
-      startTracking(taskID,  $(event.target));
-    }
-  })
-
-  //add click event to completed buttton
-  $(".container").on("click", ".completed-button", (event) => {
-    event.preventDefault();
-    let taskID = getIDFromButton(event.target);
-    markAsCompleted(taskID);
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-added", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-added").addClass("active");
-    sortBy("added");
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-due", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-due").addClass("active");
-    sortBy("due");
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-priority", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-priority").addClass("active");
-    sortBy("priority");
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-category", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-category").addClass("active");
-    sortBy("category");
-  })
+  events.addChangeDateFormateEvent();
+  events.addDisableAddButtonIfEmptyEvent();
+  events.addCreateTaskButtonEvent(addTask);
+  events.addDeleteButtonEvent(deleteTask);
+  events.addStartTrackingEvent(stopTracking, startTracking);
+  events.addCompletedTaskEvent(markAsCompleted);
+  events.addSortDropdownEvents(sortBy);
 })
 
 
@@ -120,7 +36,7 @@ function searchTask(keyword) {
       completed: false
     },
     success: (responseJSON) => {
-      displayTasks(responseJSON.tasks);
+      UIutils.displayTasks(responseJSON.tasks, "tasks");
     },
     error: (err) => {
     }
@@ -141,24 +57,13 @@ function stopTracking(taskID, button) {
   difference /= 1000;
   let seconds = Math.round(difference);
 
-  $.ajax({
-    url: "http://localhost:" + port + "/update-time-spent",
-    method: "PUT",
-    dataType: "JSON",
-    data: {
-      taskID: taskID,
-      seconds: seconds
-    },
-    success: (responseJSON) => {
-      $("#time-" + taskID).text("Time spent " + fromSecondsToHMS(responseJSON.timeSpentInSeconds));
-    },
-    error: (err) => {
-      console.log(err);
+  serverRequest.updateTimeSpent(taskID, seconds).then( (response) => {
+    if(response.status == "success") {
+      $("#time-" + taskID).text("Time spent " + timeUtils.fromSecondsToHMS(response.body));
+    } else {
+      console.log("error");
     }
-
   })
-
-  //change appereance and class names
   button.removeClass("btn-warning").removeClass("tracking").addClass("btn-primary").addClass("not-tracking");
   button.text("Start tracking");
 }
@@ -166,7 +71,7 @@ function stopTracking(taskID, button) {
 function markAsCompleted(taskID) {
   serverRequest.markTaskAsCompleted(taskID).then((response) => {
     if(response.status == "success") {
-      removeTaskCard(taskID);
+      UIutils.removeTaskCard(taskID);
     } else {
       console.log("Error");
     }
@@ -180,71 +85,24 @@ function retrieveTasks() {
   serverRequest.retrievePendingTasks().then((response) => {
     if(response.status == "success") {
       tasks = response.body;
-      displayTasks(tasks);
-      emptyFields();
+      UIutils.displayTasks(tasks, "tasks");
+      UIutils.emptyFields();
     } else {
       console.log("Error");
     }
   });
-}
-
-function displayTasks(tasks) {
-  removeAllCards();
-  for(let i = 0; i < tasks.length; i++) {
-    let date = "N/A";
-    if(tasks[i].dueDate != null) {
-      date = getFormattedDate(tasks[i].dueDate);
-    }
-    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date);
-  }
 }
 
 //delete task from db
 function deleteTask(taskID) {
   serverRequest.deleteTask(taskID).then((response) => {
     if(response.status == "success") {
-      removeTaskCard(taskID);
-      emptyFields();
+      utils.removeTaskCard(taskID);
+      utils.emptyFields();
     } else {
       console.log("Error");
     }
   });
-}
-
-/*
-Prepend a pending task card in the container
-*/
-function addTaskCard(taskID, name, description, timeSpent, category, priority, date) {
-  let cardDiv =
-  "<div class='task-card' id="+ taskID + ">" +
-      "<div class='task-header-wrapper'>" +
-        "<div class='task-header d-flex'>" +
-          "<div class='p-2 task-name'>" + name + "</div>" +
-          "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + fromSecondsToHMS(timeSpent) + "</div>" +
-          "<button class='btn btn-primary p-2 ml-auto tracking-button card-buttons not-tracking'>Start tracking</button>" +
-        "</div>" +
-
-        "<div class='task-body d-flex'>" +
-          "<div class='p-2 category-name'>Category: " + category + "</div>"+
-          "<div class='p-2 priority'>Priority: " + priority + "</div>" +
-          "<div class='p-2  date'>" + "due date: "+ date + "</div>" +
-          "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete</button>" +
-        "</div>" +
-
-        "<div class='d-flex'>" +
-        "<button class='btn btn-secondary btn-sm' type='button' data-toggle='collapse' data-target='#task-"+ taskID + "' aria-expanded='false' aria-controls='task-"+ taskID + "'> Description </button>"+
-        "<button class='btn btn-success p-2 ml-auto completed-button card-buttons'>Mark as completed</button>"+
-        "</div>" +
-
-        "<div class='collapse' id='task-"+ taskID + "'>" +
-          "<div class='card description-body'>" +
-            description +
-          "</div>" +
-        "</div>" +
-      "</div>" +
-  "</div>"
-
-  $(".container").prepend(cardDiv)
 }
 
 //send task to DB
@@ -267,8 +125,8 @@ function addTask() {
     if(response.status == "success") {
       let newTask = response.body;
       tasks.push(newTask);
-      sortBy(currentSortInDropdown());
-      emptyFields();
+      sortBy(utils.currentSortInDropdown());
+      utils.emptyFields();
     } else {
       console.log("Error");
     }
@@ -279,13 +137,13 @@ function sortBy(sort) {
   let sortedTasks = tasks;
 
   if(sort == "added") {
-    sortedTasks = sortTasksByAddedDate(tasks);
+    sortedTasks = algorithm.sortTasksByAddedDate(tasks);
   } else if(sort == "due") {
-    sortedTasks = sortTasksByDueDate(tasks);
+    sortedTasks = algorithm.sortTasksByDueDate(tasks);
   } else if(sort == "priority") {
-    sortedTasks = sortTasksByPriority(tasks);
+    sortedTasks = algorithm.sortTasksByPriority(tasks);
   } else if(sort == "category") {
-    sortedTasks = sortTasksByCategory(tasks);
+    sortedTasks = algorithm.sortTasksByCategory(tasks);
   }
-  displayTasks(sortedTasks);
+  UIutils.displayTasks(sortedTasks, "tasks");
 }

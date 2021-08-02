@@ -21,6 +21,7 @@ router.put("/search",  isAuthenticated, async (req, res) => {
     let tasks = await Task.find({$text: { $search: keyword}, completed: completed, userid: req.user.id});
     return res.status(200).json({tasks: tasks});
   } catch (e) {
+    console.log(e);
     return res.status(404);
   }
 })
@@ -30,6 +31,7 @@ router.get("/get-pending-tasks",  isAuthenticated, async (req, res) => {
     let tasks = await Task.find({completed: false, userid: req.user.id});
     return res.status(200).json({tasks: tasks});
   } catch (e) {
+    console.log(e);
     return res.status(404);
   }
 })
@@ -39,6 +41,7 @@ router.get("/get-completed-tasks",  isAuthenticated, async (req, res) => {
     let tasks = await Task.find({completed: true, userid: req.user.id});
     return res.status(200).json({tasks: tasks});
   } catch (e) {
+    console.log(e);
     return res.status(404);
   }
 })
@@ -84,6 +87,7 @@ router.delete("/delete-task/:taskID",  isAuthenticated, async (req, res) => {
     await Task.findByIdAndDelete(req.params.taskID);
     return res.status(200).json({_id: req.params.taskID});
   } catch (e) {
+    console.log(e);
     return res.status(404);
   }
 })
@@ -97,6 +101,7 @@ router.put("/update-time-spent",  isAuthenticated, async (req, res) => {
     let updatedTask = await Task.findOne({_id: taskID});
     return res.status(200).json({_id: taskID, timeSpentInSeconds: updatedTask.timeSpentInSeconds});
   } catch(e) {
+    console.log(e);
     return res.status(500);
   }
 })
@@ -110,6 +115,7 @@ router.put("/complete-task",  isAuthenticated, async (req, res) => {
     await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {completed: true, completedDate: completedDate});
     return res.status(200).json({_id: taskID});
   } catch(e) {
+    console.log(e);
     return res.status(500);
   }
 })
@@ -123,6 +129,7 @@ router.put("/uncomplete-task",  isAuthenticated, async (req, res) => {
     await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {completed: false, completedDate: null});
     return res.status(200).json({_id: taskID});
   } catch(e) {
+    console.log(e);
     return res.status(500);
   }
 })

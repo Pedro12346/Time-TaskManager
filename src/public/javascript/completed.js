@@ -1,75 +1,22 @@
 import ServerRequest from "./ServerRequest.js"
-import {getFormattedDate,
-  fromSecondsToHMS,
-  getIDFromButton,
-  removeAllCards,
-  removeTaskCard,
-  emptyFields,
-  removeActivesFromSortDropdown,
-  currentSortInDropdown} from "./Utils.js"
-
-import {
-  sortTasksByDueDate,
-  sortTasksByPriority,
-  sortTasksByCategory,
-  sortTasksByAddedDate} from "./Algorithm.js"
+import * as UIutils from "./UIutils.js"
+import * as timeUtils from "./TimeUtils.js"
+import * as algorithm from "./Algorithm.js"
+import * as events from "./Event.js"
 
 let port = "8080"
 let serverRequest = new ServerRequest(port);
 let tasks = [];
 
 $(document).ready(() => {
-
   $(".a-completed").removeClass("not-active").addClass("active");
   $(".dropdown-added").addClass("active");
 
   retrieveTasks();
 
-  //add click event to search button
-  $("#search-button").on("click", (event) => {
-    event.preventDefault();
-    let keyword = $("#search-input").val();
-    searchTask(keyword);
-  })
-
-  //add click event to delete button
-  $(".container").on("click", ".delete-button", (event) => {
-    event.preventDefault();
-    let taskID = getIDFromButton(event.target);
-    deleteTask(taskID);
-  })
-
-  //add click event to uncompleted buttton
-  $(".container").on("click", ".completed-button", (event) => {
-    event.preventDefault();
-    let taskID = getIDFromButton(event.target);
-    markAsUncompleted(taskID);
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-added", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-added").addClass("active");
-    sortBy("added");
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-due", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-due").addClass("active");
-    sortBy("due");
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-priority", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-priority").addClass("active");
-    sortBy("priority");
-  })
-
-  $(".nav-dropdown").on("click", ".dropdown-category", (event) => {
-    removeActivesFromSortDropdown();
-    $(".dropdown-category").addClass("active");
-    sortBy("category");
-  })
-
+  events.addDeleteButtonEvent(deleteTask);
+  events.addUncompletedTaskEvent(markAsUncompleted)
+  events.addSortDropdownEvents(sortBy);
 })
 
 
@@ -84,7 +31,7 @@ function searchTask(keyword) {
       completed: true
     },
     success: (responseJSON) => {
-      displayTasks(responseJSON.tasks);
+      UIutilsdisplayTasks(responseJSON.tasks, "completed");
     },
     error: (err) => {
     }
@@ -94,7 +41,7 @@ function searchTask(keyword) {
 function markAsUncompleted(taskID) {
   serverRequest.markTaskAsUncompleted(taskID).then((response) => {
     if(response.status == "success") {
-      removeTaskCard(taskID);
+      UIutils.removeTaskCard(taskID);
     } else {
       console.log("Error");
     }
@@ -105,7 +52,7 @@ function markAsUncompleted(taskID) {
 function deleteTask(taskID) {
   serverRequest.deleteTask(taskID).then((response) => {
     if(response.status == "success") {
-      removeTaskCard(taskID);
+      UIutils.removeTaskCard(taskID);
     } else {
       console.log("Error");
     }
@@ -117,7 +64,7 @@ function retrieveTasks() {
   serverRequest.retrieveCompletedTasks().then((response) => {
     if(response.status == "success") {
       tasks = response.body;
-      displayTasks(tasks);
+      UIutils.displayTasks(tasks, "completed");
     } else {
       console.log("Error")
     }
@@ -125,61 +72,17 @@ function retrieveTasks() {
 }
 
 
-function displayTasks(tasks) {
-  removeAllCards();
-  for(let i = 0; i < tasks.length; i++) {
-    let date = "N/A";
-    if(tasks[i].dueDate != null) {
-      date = getFormattedDate(tasks[i].dueDate);
-    }
-    addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date)
-  }
-}
-
-
-function addTaskCard(taskID, name, description, timeSpent, category, priority, date) {
-  let cardDiv =
-  "<div class='task-card' id="+ taskID + ">" +
-      "<div class='task-header-wrapper'>" +
-        "<div class='task-header d-flex'>" +
-          "<div class='p-2 task-name'>" + name + "</div>" +
-          "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + fromSecondsToHMS(timeSpent) + "</div>" +
-          "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete</button>" +
-        "</div>" +
-
-        "<div class='task-body d-flex'>" +
-          "<div class='p-2 category-name'>Category: " + category + "</div>"+
-          "<div class='p-2 priority'>Priority: " + priority + "</div>" +
-          "<div class='p-2 date-div'>" + "finished date: "+ date + "</div>" +
-          "<button class='btn btn-warning p-2 ml-auto completed-button card-buttons'>Mark as uncompleted</button>"+
-        "</div>" +
-
-        "<div class='d-flex'>" +
-        "<button class='btn btn-secondary btn-sm' type='button' data-toggle='collapse' data-target='#task-"+ taskID + "' aria-expanded='false' aria-controls='task-"+ taskID + "'> Description </button>"+
-        "</div>" +
-
-        "<div class='collapse' id='task-"+ taskID + "'>" +
-          "<div class='card description-body'>" +
-            description +
-          "</div>" +
-        "</div>" +
-      "</div>" +
-  "</div>"
-
-  $(".container").prepend(cardDiv);
-}
-
 function sortBy(sort) {
   let sortedTasks = tasks;
 
   if(sort == "added") {
-    sortedTasks = sortTasksByAddedDate(tasks);
+    sortedTasks = algorithm.sortTasksByAddedDate(tasks);
   } else if(sort == "due") {
-    sortedTasks = sortTasksByDueDate(tasks);
+    sortedTasks = algorithm.sortTasksByDueDate(tasks);
   } else if(sort == "priority") {
-    sortedTasks = sortTasksByPriority(tasks);
+    sortedTasks = algorithm.sortTasksByPriority(tasks);
   } else if(sort == "category") {
-    sortedTasks = sortTasksByCategory(tasks);
+    sortedTasks = algorithm.sortTasksByCategory(tasks);
   }
-  displayTasks(sortedTasks);
+  UIUtils.displayTasks(sortedTasks, "completed");
 }
