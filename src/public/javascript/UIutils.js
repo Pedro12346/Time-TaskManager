@@ -48,14 +48,14 @@ function addCompletedCard(taskID, name, description, timeSpent, category, priori
       "<div class='task-header-wrapper'>" +
         "<div class='task-header d-flex'>" +
           "<div class='p-2 task-name'>" + name + "</div>" +
-          "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + timeUtils.fromSecondsToHMS(timeSpent) + "</div>" +
+          "<div class='p-2 task-description time-spent' id=time-" + taskID +"> Time spent: " + timeUtils.fromSecondsToHMS(timeSpent) + "</div>" +
           "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete</button>" +
         "</div>" +
 
         "<div class='task-body d-flex'>" +
-          "<div class='p-2 category-name'>Category: " + category + "</div>"+
-          "<div class='p-2 priority'>Priority: " + priority + "</div>" +
-          "<div class='p-2 date-div'>" + "finished date: "+ date + "</div>" +
+          "<div class='p-2 task-description category-name'>Category: " + category + "</div>"+
+          "<div class='p-2 task-description priority'>Priority: " + priority + "</div>" +
+          "<div class='p-2 task-description date-div'>" + "Finished date: "+ date + "</div>" +
           "<button class='btn btn-warning p-2 ml-auto uncompleted-button card-buttons'>Mark as uncompleted</button>"+
         "</div>" +
 
@@ -80,14 +80,14 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
       "<div class='task-header-wrapper'>" +
         "<div class='task-header d-flex'>" +
           "<div class='p-2 task-name'>" + name + "</div>" +
-          "<div class='p-2 time-spent' id=time-" + taskID +"> Time spent: " + timeUtils.fromSecondsToHMS(timeSpent) + "</div>" +
+          "<div class='p-2 task-description time-spent' id=time-" + taskID +"> Time spent: " + timeUtils.fromSecondsToHMS(timeSpent) + "</div>" +
           "<button class='btn btn-primary p-2 ml-auto tracking-button card-buttons not-tracking'>Start tracking</button>" +
         "</div>" +
 
         "<div class='task-body d-flex'>" +
-          "<div class='p-2 category-name'>Category: " + category + "</div>"+
-          "<div class='p-2 priority'>Priority: " + priority + "</div>" +
-          "<div class='p-2  date'>" + "due date: "+ date + "</div>" +
+          "<div class='p-2 task-description category-name'>Category: " + category + "</div>"+
+          "<div class='p-2 task-description priority'>Priority: " + priority + "</div>" +
+          "<div class='p-2  task-description date'>" + "Due date: "+ date + "</div>" +
           "<button class='btn btn-danger p-2 ml-auto delete-button card-buttons'>Delete</button>" +
         "</div>" +
 
@@ -115,12 +115,19 @@ function displayTasks(tasks, type) {
       date = timeUtils.getFormattedDate(tasks[i].dueDate);
     }
 
+    if(tasks[i].category == null) {
+      tasks[i].category = "N/A"
+    }
+
     if(type == "tasks") {
       addTaskCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date);
     } else {
       addCompletedCard(tasks[i]._id, tasks[i].name, tasks[i].description, tasks[i].timeSpentInSeconds, tasks[i].category, tasks[i].priority, date)
     }
   }
+}
+
+function displaySuccessMessage(message) {
 }
 
 export {

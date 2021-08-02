@@ -9,7 +9,9 @@ aside {
   padding: 0px;
   background-color: #FFFFFF;
   flex-basis: 18%;
-  height: 870px;
+  height: 100%;
+  width: 15%;
+  position: fixed;
   box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.1);
 }
 
@@ -62,7 +64,8 @@ h1 {
 
 main {
   height: 850px;
-  flex-basis: 82%;
+  margin: 0px 0px 0px 15%;
+  flex-basis: 100%;
 }
 
 #first-row {
@@ -87,39 +90,23 @@ main {
   margin-right: 15px;
 }
 
-.category-name {
-  background-color: rgb(224, 255, 255);
-  border-radius: 20px;
-}
-
 .task-name {
-  background-color: rgb(0, 77, 153);
   border-radius: 20px;
-  color: white;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
 }
 
-.priority {
-  background-color: rgb(255, 162, 128);
-  border-radius: 20px;
-  color: white;
-}
-
-.time-spent {
-  margin-left: 20px;
-  background-color: rgb(234, 234, 251);
-  border-radius: 20px;
-}
 
 .task-card:hover {
-  background-color: rgb(0, 0, 139, 0.1);
+  background-color: rgba(0,0,0,0.1);
 }
 
 .task-card{
-  border-style: solid;
   border-radius: 25px;
-  border-color: #8080ff;
   border-width: 2px;
   margin: 10px 0px;
+  box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.1);
 }
 
 .task-header-wrapper {
@@ -138,6 +125,10 @@ main {
   margin-top: 15px;
   margin-bottom: 5px;
   padding: 10px;
+}
+
+.task-description {
+  color: rgb(128, 128, 128, 0.9);
 }
 
 .container{

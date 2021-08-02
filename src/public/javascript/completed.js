@@ -22,7 +22,7 @@ $(document).ready(() => {
 
 function filterTasks(keyword) {
   let filteredTasks = algorithm.filterTasks(keyword, tasks);
-  UIutils.displayTasks(filteredTasks);
+  UIutils.displayTasks(filteredTasks, "completed");
 }
 
 function markAsUncompleted(taskID) {

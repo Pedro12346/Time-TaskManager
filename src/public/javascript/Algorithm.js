@@ -6,9 +6,9 @@ function sortTasksByAddedDate(tasks) {
 
 function sortTasksByDueDate(tasks) {
   return tasks.sort((first, second) => {
-    if(first.dueDate == null) {
+    if(first.dueDate == "" || first.dueDate == null) {
       return false;
-    } else if(second.dueDate == null) {
+    } else if(first.dueDate == "" || second.dueDate == null) {
       return true;
     }
     return new Date(second.dueDate) - new Date(first.dueDate);
@@ -24,9 +24,9 @@ function sortTasksByPriority(tasks) {
 function sortTasksByCategory(tasks) {
   return tasks.sort((first, second) => {
 
-    if(first.category == "") {
+    if(first.category == "" || first.category == null) {
       return false;
-    } else if(second.category == "") {
+    } else if(second.category == "" || second.category == null) {
       return true;
     }
 

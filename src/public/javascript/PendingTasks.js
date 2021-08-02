@@ -29,7 +29,7 @@ $(document).ready(() => {
 
 function filterTasks(keyword) {
   let filteredTasks = algorithm.filterTasks(keyword, tasks);
-  UIutils.displayTasks(filteredTasks);
+  UIutils.displayTasks(filteredTasks, "tasks");
 }
 
 function startTracking(taskID, button) {
@@ -116,6 +116,7 @@ function addTask() {
       tasks.push(newTask);
       sortBy(UIutils.currentSortInDropdown());
       UIutils.emptyFields();
+      UIutils.displaySuccessMessage("The task has been added");
     } else {
       console.log("Error");
     }

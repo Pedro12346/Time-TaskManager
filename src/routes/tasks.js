@@ -14,18 +14,6 @@ router.get("/completed-tasks", (req, res) => {
   res.render("tasks/completed");
 })
 
-//search tasks by keyword
-router.put("/search",  isAuthenticated, async (req, res) => {
-  let {keyword, completed} = req.body
-  try {
-    let tasks = await Task.find({$text: { $search: keyword}, completed: completed, userid: req.user.id});
-    return res.status(200).json({tasks: tasks});
-  } catch (e) {
-    console.log(e);
-    return res.status(404);
-  }
-})
-
 router.get("/get-pending-tasks",  isAuthenticated, async (req, res) => {
   try {
     let tasks = await Task.find({completed: false, userid: req.user.id});
