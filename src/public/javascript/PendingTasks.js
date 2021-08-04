@@ -15,7 +15,6 @@ $(document).ready(() => {
   $(".dropdown-added").addClass("active");
 
   retrieveTasks();
-
   events.addSearchInputEvent(filterTasks);
   events.addChangeDateFormateEvent();
   events.addDisableAddButtonIfEmptyEvent();
@@ -24,8 +23,8 @@ $(document).ready(() => {
   events.addStartTrackingEvent(stopTracking, startTracking);
   events.addCompletedTaskEvent(markAsCompleted);
   events.addSortDropdownEvents(sortBy);
+  events.addAttachmentEvents(getFileInfo, uploadFile, deleteFile);
 })
-
 
 function filterTasks(keyword) {
   let filteredTasks = algorithm.filterTasks(keyword, tasks);
@@ -50,7 +49,7 @@ function stopTracking(taskID, button) {
     if(response.status == "success") {
       $("#time-" + taskID).text("Time spent " + timeUtils.fromSecondsToHMS(response.body));
     } else {
-      console.log("error");
+      console.log("Error");
     }
   })
   button.removeClass("btn-warning").removeClass("tracking").addClass("btn-primary").addClass("not-tracking");
@@ -67,9 +66,6 @@ function markAsCompleted(taskID) {
   });
 }
 
-/*
-Get all pending tasks from db
-*/
 function retrieveTasks() {
   serverRequest.retrievePendingTasks().then((response) => {
     if(response.status == "success") {
@@ -116,7 +112,6 @@ function addTask() {
       tasks.push(newTask);
       sortBy(UIutils.currentSortInDropdown());
       UIutils.emptyFields();
-      UIutils.displaySuccessMessage("The task has been added");
     } else {
       console.log("Error");
     }
@@ -136,4 +131,46 @@ function sortBy(sort) {
     sortedTasks = algorithm.sortTasksByCategory(tasks);
   }
   UIutils.displayTasks(sortedTasks, "tasks");
+}
+
+function getFileInfo(taskID) {
+  let fileInfo = null;
+
+  for(let i = 0; i < tasks.length; i++)  {
+    if(tasks[i]._id == taskID) {
+      return tasks[i].fileInfo;
+    }
+  }
+  return fileInfo;
+}
+
+function addFileInfo(taskID, fileInfo) {
+  for(let i = 0; i < tasks.length; i++)  {
+    if(tasks[i]._id == taskID) {
+      tasks[i].fileInfo = fileInfo;
+    }
+  }
+}
+
+function removeFileInfo(taskID) {
+  for(let i = 0; i < tasks.length; i++)  {
+    if(tasks[i]._id == taskID) {
+      tasks[i].fileInfo = null;
+    }
+  }
+}
+
+function uploadFile(taskID) {
+  let file = $('#my-file').prop('files')[0];
+  serverRequest.uploadFile(taskID, file).then( (response) => {
+    addFileInfo(taskID, response.body.fileInfo);
+    UIutils.displayAttachmentInfo(response.body.fileInfo.name, response.body.fileInfo.publicURL);
+  });
+}
+
+function deleteFile(taskID) {
+  serverRequest.deleteFile(taskID).then( (response) => {
+    removeFileInfo(response.body._id);
+    UIutils.hideAttachmentInfo();
+  });
 }

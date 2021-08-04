@@ -1,16 +1,19 @@
-let express = require("express")
-let path = require("path")
-let hbs = require("express-handlebars")
-let methodOverride = require("method-override")
-let session = require("express-session")
-let passport = require("passport")
+let express = require("express");
+let path = require("path");
+let hbs = require("express-handlebars");
+let methodOverride = require("method-override");
+let session = require("express-session");
+let passport = require("passport");
+var admin = require("firebase-admin");
+
 
 //Inits
-require("dotenv").config()
-require("./config/database")
-require("./config/passport")
+require("dotenv").config();
+require("./config/database");
+require("./config/passport");
+require("./config/storage");
 
-let app = express()
+let app = express();
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")

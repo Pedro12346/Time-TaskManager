@@ -182,6 +182,50 @@ class ServerRequest {
     });
     return response;
   }
+
+  async uploadFile(taskID, file) {
+    let response = {};
+
+    var formData = new FormData();
+    formData.append("taskID", taskID);
+    formData.append("file", file);
+
+    await $.ajax({
+      url: "http://localhost:" + this.port + "/add-file",
+      method: "PUT",
+      dataType: "JSON",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: (responseJSON) => {
+        response.status = "success";
+        response.body = responseJSON;
+      },
+      error: (err) => {
+        response.status = "error";
+        console.log(err);
+      }
+    });
+    return response;
+  }
+
+  async deleteFile(taskID) {
+    let response = {};
+    await $.ajax({
+      url: "http://localhost:" + this.port + "/delete-file/" + taskID,
+      method: "DELETE",
+      dataType: "JSON",
+      success: (responseJSON) => {
+        response.status = "success";
+        response.body = responseJSON;
+      },
+      error: (err) => {
+        console.log(err)
+        response.status = "error";
+      }
+    })
+    return response;
+  }
 }
 
 export default ServerRequest

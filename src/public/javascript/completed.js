@@ -18,6 +18,7 @@ $(document).ready(() => {
   events.addDeleteButtonEvent(deleteTask);
   events.addUncompletedTaskEvent(markAsUncompleted)
   events.addSortDropdownEvents(sortBy);
+  events.addAttachmentEvents(getFileInfo, uploadFile, deleteFile);
 })
 
 function filterTasks(keyword) {
@@ -72,4 +73,47 @@ function sortBy(sort) {
     sortedTasks = algorithm.sortTasksByCategory(tasks);
   }
   UIUtils.displayTasks(sortedTasks, "completed");
+}
+
+
+function getFileInfo(taskID) {
+  let fileInfo = null;
+
+  for(let i = 0; i < tasks.length; i++)  {
+    if(tasks[i]._id == taskID) {
+      return tasks[i].fileInfo;
+    }
+  }
+  return fileInfo;
+}
+
+function addFileInfo(taskID, fileInfo) {
+  for(let i = 0; i < tasks.length; i++)  {
+    if(tasks[i]._id == taskID) {
+      tasks[i].fileInfo = fileInfo;
+    }
+  }
+}
+
+function removeFileInfo(taskID) {
+  for(let i = 0; i < tasks.length; i++)  {
+    if(tasks[i]._id == taskID) {
+      tasks[i].fileInfo = null;
+    }
+  }
+}
+
+function uploadFile(taskID) {
+  let file = $('#my-file').prop('files')[0];
+  serverRequest.uploadFile(taskID, file).then( (response) => {
+    addFileInfo(taskID, response.body.fileInfo);
+    UIutils.displayAttachmentInfo(response.body.fileInfo.name, response.body.fileInfo.publicURL);
+  });
+}
+
+function deleteFile(taskID) {
+  serverRequest.deleteFile(taskID).then( (response) => {
+    removeFileInfo(response.body._id);
+    UIutils.hideAttachmentInfo();
+  });
 }

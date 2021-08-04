@@ -61,6 +61,7 @@ function addCompletedCard(taskID, name, description, timeSpent, category, priori
 
         "<div class='d-flex'>" +
         "<button class='btn btn-secondary btn-sm' type='button' data-toggle='collapse' data-target='#task-"+ taskID + "' aria-expanded='false' aria-controls='task-"+ taskID + "'> Description </button>"+
+        "<button class='btn btn-info btn-sm attachment-button' type='button' data-toggle='modal' data-target='#attachment-modal' aria-controls='task-"+ taskID + "'> Attachment </button>"+
         "</div>" +
 
         "<div class='collapse' id='task-"+ taskID + "'>" +
@@ -93,6 +94,7 @@ function addTaskCard(taskID, name, description, timeSpent, category, priority, d
 
         "<div class='d-flex'>" +
         "<button class='btn btn-secondary btn-sm' type='button' data-toggle='collapse' data-target='#task-"+ taskID + "' aria-expanded='false' aria-controls='task-"+ taskID + "'> Description </button>"+
+        "<button class='btn btn-info btn-sm attachment-button' type='button' data-toggle='modal' data-target='#attachment-modal' aria-controls='task-"+ taskID + "'> Attachment </button>"+
         "<button class='btn btn-success p-2 ml-auto completed-button card-buttons'>Mark as completed</button>"+
         "</div>" +
 
@@ -127,7 +129,17 @@ function displayTasks(tasks, type) {
   }
 }
 
-function displaySuccessMessage(message) {
+function displayAttachmentInfo(filename, url) {
+  $(".attachment-name").text("");
+  $(".attachment-name").append("Filename: " + "<a href='" + url + "'>" + filename + "</a>");
+  $("my-file").text("Change file: ");
+  $(".attachment-delete-button").show();
+}
+
+function hideAttachmentInfo() {
+  $(".attachment-name").text("No file attached");
+  $(".attachment-delete-button").hide();
+  $(".my-file").text("Add file: ");
 }
 
 export {
@@ -137,4 +149,6 @@ export {
   emptyFields,
   removeActivesFromSortDropdown,
   currentSortInDropdown,
-  displayTasks}
+  displayTasks,
+  displayAttachmentInfo,
+  hideAttachmentInfo}

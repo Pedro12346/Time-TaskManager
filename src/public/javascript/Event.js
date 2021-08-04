@@ -1,7 +1,10 @@
 import {
   getIDFromButton,
   removeActivesFromSortDropdown,
+  displayAttachmentInfo,
+  hideAttachmentInfo
 } from "./UIutils.js"
+import ServerRequest from "./ServerRequest.js"
 
 function addChangeDateFormateEvent(){
     $("#date-input").on("click", () => {
@@ -102,6 +105,52 @@ function addSearchInputEvent(filterTasks) {
   })
 }
 
+function addDeleteAttachmentButtonEvent(deleteFile) {
+  $(".attachment-delete-button").on("click",(event) => {
+    let taskID = $(".attachment-delete-button").attr("data-taskID");
+    deleteFile(taskID);
+  });
+}
+
+function addUploadFileButtonEvent(uploadFile){
+  $(".attachment-upload-button").on("click", (event) =>  {
+    event.preventDefault();
+    let taskID = $(".attachment-upload-button").attr("data-taskID");
+    if($("#my-file").val()) {
+      uploadFile(taskID);
+    } else {
+
+    }
+  })
+}
+
+function addCloseFileButtonEvent() {
+  $(".close-file-modal-button").on("click", (event) => {
+    event.preventDefault();
+    $("#my-file").val("");
+  })
+}
+
+function addAttachmentEvents(getFileInfo, uploadFile, deleteFile) {
+  $(".container").on("click", ".attachment-button", (event) => {
+    event.preventDefault();
+    let taskID = getIDFromButton(event.target);
+    let fileInfo = getFileInfo(taskID);
+
+    $(".attachment-upload-button").attr("data-taskID", taskID);
+    $(".attachment-delete-button").attr("data-taskID", taskID);
+
+    if(fileInfo != null)  {
+      displayAttachmentInfo(fileInfo.name, fileInfo.publicURL);
+    } else {
+      hideAttachmentInfo();
+    }
+  });
+  addUploadFileButtonEvent(uploadFile);
+  addDeleteAttachmentButtonEvent(deleteFile);
+  addCloseFileButtonEvent();
+}
+
 export {
   addSortDropdownEvents,
   addCompletedTaskEvent,
@@ -111,5 +160,6 @@ export {
   addCreateTaskButtonEvent,
   addDisableAddButtonIfEmptyEvent,
   addChangeDateFormateEvent,
-  addSearchInputEvent
+  addSearchInputEvent,
+  addAttachmentEvents
  }

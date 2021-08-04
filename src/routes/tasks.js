@@ -3,6 +3,11 @@ let router = express.Router();
 let Task = require("../models/Task.js");
 let moment = require("../helpers/moment.js");
 let {isAuthenticated} = require("../helpers/auth");
+let multer  = require('multer');
+let upload  = multer({ storage: multer.memoryStorage(), preservePath: true });
+var admin = require("firebase-admin");
+let bucket = admin.storage().bucket();
+let { format } = require("util");
 
 //Get pending tasks view
 router.get("/pending-tasks", (req, res) => {
@@ -59,6 +64,7 @@ router.post("/insert-task",  isAuthenticated, async (req, res) => {
   let newTask = new Task({name, description, category, priority, dueDate, timeSpentInSeconds, completed, completedDate});
   newTask.userid = req.user.id;
   newTask.addedOn = new Date();
+  newTask.fileInfo = null;
   try {
     await newTask.save();
     return res.status(200).json(newTask);
@@ -115,6 +121,86 @@ router.put("/uncomplete-task",  isAuthenticated, async (req, res) => {
 
   try {
     await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {completed: false, completedDate: null});
+    return res.status(200).json({_id: taskID});
+  } catch(e) {
+    console.log(e);
+    return res.status(500);
+  }
+})
+
+router.put("/add-file", isAuthenticated, upload.single("file"), async(req, res) => {
+
+  let {taskID} = req.body;
+
+  let task = await Task.findOne({_id: taskID});
+  let fileInfo = task.fileInfo;
+
+  if(fileInfo) {
+    try {
+      await bucket.file(fileInfo.dbName).delete();
+      await Task.findOneAndUpdate({_id: taskID}, {fileInfo: null});
+    } catch(e) {
+      return res.status(500);
+    }
+  }
+
+  try {
+    if(!req.file) {
+      return res.status(500);
+    }
+
+    let blob = bucket.file(req.file.originalname);
+    blob.name = `${new Date().getTime()}_${blob.name}`;
+    let blobStream = blob.createWriteStream({ resumable: false});
+
+    blobStream.on("error", (err) => {
+      return res.status(500);
+    })
+
+    blobStream.on("finish", async(data) => {
+      let publicURL = format(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
+      try {
+        await bucket.file(blob.name).makePublic();
+      } catch(e) {
+        console.log(e);
+        return res.status(500);
+      }
+
+      try {
+        let fileInfo = {
+          name: req.file.originalname,
+          dbName: blob.name,
+          publicURL: publicURL
+        }
+        await Task.findOneAndUpdate({_id: taskID, userid: req.user.id}, {fileInfo: fileInfo});
+        console.log("Success - public URL = ", publicURL);
+        return res.status(200).json({fileInfo});
+      } catch(e) {
+        return res.status(500);
+      }
+
+      return res.status(200);
+    })
+
+    blobStream.end(req.file.buffer);
+  } catch(e){
+    return res.status(500);
+  }
+})
+
+router.delete("/delete-file/:taskID", isAuthenticated, async(req, res) => {
+
+  let taskID = req.params.taskID;
+  let task = await Task.findOne({_id: taskID});
+  let fileInfo = task.fileInfo;
+
+  if(!fileInfo) {
+    return res.status(500);
+  }
+
+  try {
+    await bucket.file(fileInfo.dbName).delete();
+    await Task.findOneAndUpdate({_id: taskID}, {fileInfo: null});
     return res.status(200).json({_id: taskID});
   } catch(e) {
     console.log(e);
